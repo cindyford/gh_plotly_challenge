@@ -124,37 +124,41 @@ function buildBar() {
 
         //Create the bubble plot
         Plotly.newPlot("bubble", bubbleData, bubbleLayout);
+
+
+        //Attempted Bonus but couldn't get it to work properly.  I have a dot and an arrow but they don't line up with my pie graph
+        //trace for the basic pie chart
         var trace3 = {
-            "domain": { "x": [0, .48] },
-            "marker": {
-                "colors": [
-                    'rgb(255, 255, 255)',
-                    'rgb(255, 255, 255)',
-                    'rgb(255, 255, 255)',
-                    'rgb(255, 255, 255)',
-                    'rgb(255, 255, 255)',
-                    'rgb(255, 255, 255)',
-                    'rgb(255, 255, 255)'
+            domain: { "x": [0, .48] },
+            marker: {
+                colors: [
+                    "rgb(255, 255, 255)",
+                    "rgb(255, 255, 255)",
+                    "rgb(255, 255, 255)",
+                    "rgb(255, 255, 255)",
+                    "rgb(255, 255, 255)",
+                    "rgb(255, 255, 255)",
+                    "rgb(255, 255, 255)"
                 ],
-                "line": {
-                    "width": 1
+                line: {
+                    width: 1
                 }
             },
-            "name": "Gauge",
-            "hole": .4,
-            "type": "pie",
-            "direction": "clockwise",
-            "rotation": 108,
-            "showlegend": false,
-            "hoverinfo": "none",
-            "textinfo": "label",
-            "textposition": "outside"
+            name: "Gauge",
+            hole: .4,
+            type: "pie",
+            direction: "clockwise",
+            rotation: 108,
+            showlegend: false,
+            hoverinfo: "none",
+            textinfo: "label",
+            textposition: "outside"
         };
 
-
+        //Overlay pie chart
         var trace4 = {
-            "values": [50, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9],
-            "labels": [" ",
+            values: [50, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9],
+            labels: [" ",
                 "0-1",
                 "1-2",
                 "2-3",
@@ -165,73 +169,89 @@ function buildBar() {
                 "7-8",
                 "8-9"
             ],
-            "marker": {
-                'colors': ['white',"Earth"
+            marker: {
+                'colors': ['white', "Earth"
                 ]
             },
-            "domain": { "x": [0, .48] },
-            "name": "Wash Frequency",
-            "hole": .3,
-            "type": "pie",
-            "direction": "clockwise",
-            "rotation": 90,
-            "showlegend": false,
-            "textinfo": "label",
-            "textposition": "inside",
-            // "hoverinfo": "none"
+            domain: { "x": [0, .48] },
+            name: "Wash Frequency",
+            hole: .3,
+            type: "pie",
+            direction: "clockwise",
+            rotation: 90,
+            showlegend: false,
+            textinfo: "label",
+            textposition: "inside",
         };
 
-        var trace5 ={
+
+        //creates the dot
+        var trace5 = {
             type: 'scatter',
-            x:[0],
-            y:[0],
+            x: [0],
+            y: [0],
             marker: {
-              size: 14,
-              color:'850000'
+                size: 14,
+                color: '850000'
             },
             showlegend: false
         };
 
+        // Trig to calc meter point
+        var degrees = 180 - (wfreq*20),
+            radius = .5;
+        var radians = degrees * Math.PI / 180;
+        var x = radius * Math.cos(radians);
+        var y = radius * Math.sin(radians);
+        var path1 = 'M -0.0 -0.025 L 0.0 0.025 L ';
+        // Path: may have to change to create a better triangle
+        var mainPath = path1,
+            pathX = String(x),
+            space = ' ',
+            pathY = String(y),
+            pathEnd = ' Z';
+        var path = mainPath.concat(pathX, space, pathY, pathEnd);
+
+        //creates the arrow
+        var arrowtrace = [{
+            type: 'scatter',
+            x: [0], y: [0],
+            marker: { size: 14, color: '850000' },
+            showlegend: false,
+            name: `${wfreq}`,
+            text: "Washes: ",
+            hoverinfo: 'text+name'
+        }
+        ];
+
+        //layout
         var gaugelayout = {
-            'xaxis': {
-                'showticklabels': false,
-                'showgrid': false,
-                'zeroline': false,
+            xaxis: {
+                showticklabels: false,
+                showgrid: false,
+                zeroline: false,
             },
-            'yaxis': {
-                'showticklabels': false,
-                'showgrid': false,
-                'zeroline': false,
+            yaxis: {
+                showticklabels: false,
+                showgrid: false,
+                zeroline: false,
             },
             'shapes': [
                 {
-                    'type': 'path',
-                    'path': 'M 0.235 0.5 L 0.24 0.65 L 0.245 0.5 Z',
-                    'fillcolor': 'rgba(44, 160, 101, 0.5)',
-                    'line': {
+                    type: 'path',
+                    path: path,
+                    fillcolor: '850000',
+                    line: {
                         'width': 0.5
                     },
-                    'xref': 'paper',
-                    'yref': 'paper'
+                    xref: 'paper',
+                    yref: 'paper'
                 }
             ],
-            // 'annotations': [
-            //     {
-            //         'xref': 'paper',
-            //         'yref': 'paper',
-            //         'x': 0.23,
-            //         'y': 0.45,
-            //         'text': '',
-            //         'showarrow': false
-            //     }
-            // ],
             height: 600,
-            width: 600, 
-            title :{
-                text: "Belly Button Washing Frequency",
-                position: "top left"}
-            };
-        trace3['marker']['line']['width'] = 0
+            width: 600
+        }
+        trace3['marker']['line']['width'] = 0;
 
         var gaugeData = [trace3, trace4, trace5];
         Plotly.newPlot("gauge", gaugeData, gaugelayout);
